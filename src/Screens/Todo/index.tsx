@@ -1,48 +1,114 @@
-import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, FlatList } from "react-native";
-import Checkbox from 'expo-checkbox';
+import { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  Image,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import Checkbox from "expo-checkbox";
 import { styles } from "./styles";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
-type TodoProps = {
-  onCompleteChange: React.Dispatch<React.SetStateAction<number>>;
+type TodoItem = {
+  id: string;
+  text: string;
 };
 
-export default function Todo({ onCompleteChange }: TodoProps) {
-  console.log('onCompleteChange:', onCompleteChange); // debug
-  const [isChecked, setChecked] = useState(false);
+type TodoProps = {
+  todos: TodoItem[];
+  onDeleteTodo: (id: string) => void;
+  onCompleteChange: (count: number) => void;
+};
+
+export default function Todo({
+  todos,
+  onDeleteTodo,
+  onCompleteChange,
+}: TodoProps) {
+  const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    onCompleteChange(0)
-    onCompleteChange(prev => isChecked ? prev + 1 : prev - 0);
+    const completedCount = Object.values(checkedItems).filter(Boolean).length;
+    onCompleteChange(completedCount);
+  }, [checkedItems]);
 
-  }, [isChecked]);
-  
+  const toggleCheckbox = (id: string) => {
+    setCheckedItems((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
 
-  const todoStyle = isChecked
-    ? StyleSheet.flatten([styles.text, { textDecorationLine: 'line-through' as 'line-through', color: '#808080' }])
-    : styles.text;
-
-  const todoArroundStyle = isChecked
-    ? StyleSheet.flatten([styles.todo, { borderColor: '#1A1A1A' }])
-    : styles.todo;
+  const handleDelete = (id: string) => {
+    if (onDeleteTodo) {
+      onDeleteTodo(id);
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <View>
-        <View style={todoArroundStyle}>
-          <FlatList data={[1]} renderItem={() => (
-            <Image
-              source={require('../../../assets/trash.png')}
-              style={{ width: 24, height: 24, marginLeft: 12 }}
+      <FlatList
+        data={todos}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => {
+          const isChecked = !!checkedItems[item.id];
+
+          const todoStyle = isChecked
+            ? StyleSheet.flatten([
+                styles.text,
+                {
+                  textDecorationLine: "line-through" as "line-through",
+                  color: "#808080",
+                },
+              ])
+            : styles.text;
+
+          const todoArroundStyle = isChecked
+            ? [styles.todo, { borderColor: "#1A1A1A" }]
+            : styles.todo;
+
+          return (
+            <View style={todoArroundStyle}>
+              <Checkbox
+                style={styles.check}
+                value={isChecked}
+                onValueChange={() => toggleCheckbox(item.id)}
+              />
+              <Text style={todoStyle}>{item.text}</Text>
+              <TouchableOpacity onPress={() => handleDelete(item.id)}>
+                <Image
+                  source={require("../../../assets/trash.png")}
+                  style={{ width: 32, height: 32, cursor: "pointer" }}
+                />
+              </TouchableOpacity>
+            </View>
+          );
+        }}
+        ListEmptyComponent={() => (
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <View
+              style={{
+                marginBottom: 16,
+                backgroundColor: "#808080",
+                width: "85%",
+                height: 1,
+              }}
             />
-          )} keyExtractor={(item) => item.toString()} />
-          <Checkbox style={styles.check} value={isChecked} onValueChange={setChecked} />
-          <Text style={todoStyle}>Integer urna interdum massa libero auctor neque turpis turpis semper.</Text>
-        </View>
-
-        
-
-      </View>
+            <FontAwesome5 name="clipboard-list" size={90} color="#808080" />
+            <View style={{ marginBottom: 16 }} />
+            <Text style={styles.categoryBold}>
+              Você ainda não tem tarefas cadastradas
+            </Text>
+            <Text style={styles.category}>
+              Crie tarefas e organize seus itens a fazer
+            </Text>
+          </View>
+        )}
+      />
     </View>
   );
 }

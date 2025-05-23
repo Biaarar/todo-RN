@@ -24,22 +24,24 @@ export const styles = StyleSheet.create({
       height: 19,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: '#F2F2F2',
+      backgroundColor: '#333333',
       borderRadius: 100,
       textAlign: 'center',
       marginLeft: 8,
+      color: '#FFFFFF',
     },
     input:{
       flexDirection: 'row',
       backgroundColor: '#262626',
       borderRadius: 8,
-      marginTop: -30,
-      marginBottom: 20,
-      width: 271,
+      flex: 1,
       height: 54,
       fontSize: 16,
-      padding: 2,
+      padding: 16,
       color: '#FFFFFF',
+
+      borderWidth:1, 
+      borderColor: '#0D0D0D'
     },
     button:{
       borderRadius: 8,
@@ -48,8 +50,6 @@ export const styles = StyleSheet.create({
       backgroundColor: '#1E6F9F',
       justifyContent: 'center',
       alignItems: 'center',
-      marginTop: -50,
-      marginLeft: 4,
     },
     insert:{
       flexDirection: 'row',
@@ -71,5 +71,4 @@ export const styles = StyleSheet.create({
     list:{
         backgroundColor: '#1A1A1A',
     }
-
   });
